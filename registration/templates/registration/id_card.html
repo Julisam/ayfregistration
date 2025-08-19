@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ID Card - {{ participant.full_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            .id-card, .id-card * { visibility: visible; }
+            .id-card { position: absolute; top: 0; left: 0; }
+            .no-print { display: none !important; }
+        }
+        .id-card {
+            width: 280px;
+            height: 300px;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+        }
+        .id-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #fff;
+            padding: 10px 5px; 
+            text-align: center;
+            position: relative;
+        }
+        .id-header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 10px solid #34495e;
+        }
+        .id-header h5 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .id-content {
+            padding: 30px 20px 20px;
+        }
+        .top-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .photo-section {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 3px solid #fff;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .photo-section::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            border: 2px solid #e9ecef;
+            z-index: -1;
+        }
+        .photo-section img {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .name-section {
+            flex: 1;
+        }
+        .name-section h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+        }
+        .name-section .role {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .name-section .camp-id {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+        .info-section {
+            width: 100%;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f2f6;
+            margin-bottom: 8px;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .info-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .info-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: right;
+            max-width: 140px;
+            word-wrap: break-word;
+        }
+        .camp-id {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 1500;
+            font-size: 14px;
+            /* margin-top: 15px; */
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="text-center no-print mb-4">
+            <button onclick="window.print()" class="btn btn-success me-2">Print ID Card</button>
+            <a href="{% url 'register' %}" class="btn btn-secondary">Register Another</a>
+        </div>
+        
+        <div class="id-card">
+            <div class="id-header">
+                <h5>DIRECTORATE OF YOUTH</h5>
+                <h5 class="mb-0">2025 Youth Camp</h5>
+            </div>
+            <div class="id-content">
+                <div class="top-section">
+                    <div class="photo-section">
+                        {% if participant.photo %}
+                            <img src="{{ participant.photo.url }}" alt="Photo">
+                        {% else %}
+                            <div style="color: #95a5a6; font-size: 9px; text-align: center;">NO<br>PHOTO</div>
+                        {% endif %}
+                    </div>
+                    <div class="name-section">
+                        <h4>{{ participant.full_name }}</h4>
+                        {% if participant.role %}
+                            <div class="role">{{ participant.role }}</div>
+                        {% endif %}
+                        <div class="camp-id">
+                            {{ participant.camp_label }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    {% if participant.archdeaconry %}
+                    <div class="info-row">
+                        <span class="info-label">Archdeaconry</span>
+                        <span class="info-value">{{ participant.archdeaconry }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if participant.room_label %}
+                    <div class="info-row">
+                        <span class="info-label">Room</span>
+                        <span class="info-value">{{ participant.room_label }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
