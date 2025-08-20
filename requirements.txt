@@ -1,2 +1,6 @@
 Django
 Pillow
+
+# django-extensions
+# Werkzeug
+# pyOpenSSL
