@@ -95,6 +95,7 @@
             font-size: 14px;
             font-weight: 900;
             color: #2c3e50;
+            max-height: 40px;
         }
         .name-section .role {
             font-size: 14px;
@@ -105,13 +106,13 @@
         .name-section .camp-id {
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
-            padding: 4px 20px;
+            padding: 0px 20px;
             border-radius: 8px;
             font-weight: 800;
             font-size: 24px;
             letter-spacing: 0.5px;
             display: inline-block;
-            margin-top: 7px;
+            margin-top: 6px;
             /* margin-left: 5%; */
         }
         .info-section {
@@ -149,8 +150,30 @@
     <div class="container mt-4">
         <div class="text-center no-print mb-4">
             <h3>Bulk Print ID Cards</h3>
-            <p>Printing {{ participants|length }} cards (Camp IDs {{ start_id }} - {{ start_id|add:11 }})</p>
+            <form method="get" class="mb-3">
+                <div class="row justify-content-center">
+                    <div class="col-md-3">
+                        <label class="form-label">Participant Type:</label>
+                        <select name="type" class="form-control" onchange="this.form.submit()">
+                            <option value="C" {% if participant_type == 'C' %}selected{% endif %}>Campers (C)</option>
+                            <option value="G" {% if participant_type == 'G' %}selected{% endif %}>Officials/Guest (G)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Card Range:</label>
+                        <select name="range" class="form-control" onchange="this.form.submit()">
+                            {% for range_option in card_ranges %}
+                            <option value="{{ range_option.start }}" {% if range_option.start == current_start %}selected{% endif %}>
+                                Cards {{ range_option.start }}-{{ range_option.end }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <p>Printing {{ participants|length }} cards ({{ participant_type }}{{ current_start|stringformat:"03d" }} - {{ participant_type }}{{ current_end|stringformat:"03d" }})</p>
             <button onclick="window.print()" class="btn btn-success me-2">Print Cards</button>
+            <a href="{% url 'bulk_voucher' %}" class="btn btn-info me-2">Bulk Voucher</a>
             <a href="{% url 'register' %}" class="btn btn-secondary">Back to Registration</a>
         </div>
         
@@ -158,7 +181,7 @@
             {% for participant in participants %}
             <div class="id-card">
                 <div class="id-header">
-                    <h6>DIRECTORATE OF YOUTH</h6>
+                    <h6>THE DIRECTORATE OF YOUTH</h6>
                     <h5>2025 Youth Camp</h5>
                 </div>
                     <div class="triangle"></div>

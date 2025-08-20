@@ -65,6 +65,12 @@
                                         <button type="button" id="retake-photo" class="btn btn-warning btn-sm" style="display:none;">Retake</button>
                                     </div>
                                 </div>
+                                <div id="file-section" style="display:none;" class="mt-3">
+                                    <input type="file" id="file-input" class="form-control" accept="image/*">
+                                    <div id="file-preview" class="mt-2" style="display:none;">
+                                        <img id="file-photo" width="300" height="200" style="filter: grayscale(100%);" />
+                                    </div>
+                                </div>
                                 <input type="hidden" name="photo_data" id="photo-data">
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Register</button>
@@ -91,7 +97,29 @@
                 document.getElementById('start-camera').style.display = 'none';
                 document.getElementById('capture-photo').style.display = 'inline-block';
             } catch (err) {
-                alert('Camera access denied or not available');
+                document.getElementById('camera-section').style.display = 'none';
+                document.getElementById('file-section').style.display = 'block';
+            }
+        };
+        
+        document.getElementById('file-input').onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        canvas.width = 300;
+                        canvas.height = 200;
+                        ctx.drawImage(img, 0, 0, 300, 200);
+                        const dataURL = canvas.toDataURL('image/jpeg');
+                        document.getElementById('file-photo').src = dataURL;
+                        photoData.value = dataURL;
+                        document.getElementById('file-preview').style.display = 'block';
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
             }
         };
         

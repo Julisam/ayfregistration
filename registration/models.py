@@ -21,21 +21,21 @@ class Participant(models.Model):
         ('Chaplain', 'Chaplain'),
         ('Special Guest', 'Special Guest'),
         ('Vendor', 'Vendor'),
-        ('Executive', 'Executive'),
-        ('Leader', 'Leader'),
         ('Delegate', 'Delegate'),
+        ('Leader', 'Leader'),
+        ('Executive', 'Executive'),
     ]
 
     
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    email = models.EmailField(unique=False)
-    phone = models.CharField(max_length=15)
+    email = models.EmailField(unique=False, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
     dob = models.DateField()
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
-    parish = models.CharField(max_length=100, blank=True)
-    archdeaconry = models.CharField(max_length=100, choices=ARCHDEACONRY_CHOICES, blank=True)
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES, blank=True)
+    parish = models.CharField(max_length=100)
+    archdeaconry = models.CharField(max_length=100, choices=ARCHDEACONRY_CHOICES)
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     photo = models.ImageField(upload_to='photos/', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -47,7 +47,7 @@ class Participant(models.Model):
     
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name.upper()}"
+        return f"{self.first_name.strip()} {self.last_name.upper()}"
     
     @property
     def room_label(self):
@@ -68,8 +68,14 @@ class Participant(models.Model):
         CAMPERS = ['Executive', 'Leader', 'Delegate']
         
         if not self.camp_id:
-            last_participant = Participant.objects.order_by('id').last()
-            self.camp_id = (last_participant.camp_id if last_participant else 0) + 1
+            if self.role in CAMPERS:
+                # Get next C serial number
+                last_camper = Participant.objects.filter(role__in=CAMPERS).order_by('camp_id').last()
+                self.camp_id = (last_camper.camp_id if last_camper else 0) + 1
+            else:
+                # Get next G serial number
+                last_guest = Participant.objects.exclude(role__in=CAMPERS).order_by('camp_id').last()
+                self.camp_id = (last_guest.camp_id if last_guest else 0) + 1
         
         if not self.room_no and self.role in CAMPERS:
             same_gender_count = Participant.objects.filter(gender=self.gender, role__in=CAMPERS).count()
